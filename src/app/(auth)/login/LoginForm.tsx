@@ -1,8 +1,11 @@
 "use client";
 
-import { signupSchema, SignUpValues } from "@/lib/validation";
-import { useForm } from "react-hook-form";
+import { LoginValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState, useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { loginSchema } from "@/lib/validation";
+import { login } from "./actions";
 import {
   Form,
   FormControl,
@@ -11,34 +14,28 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState, useTransition } from "react";
-import { signup } from "./actions";
-import { set } from "zod";
-import { PasswordInput } from "@/components/PaswordInput";
 import LoadingButton from "@/components/ui/LoadingButton";
+import { PasswordInput } from "@/components/PaswordInput";
 
-export default function SignUpForm() {
+const LoginForm = () => {
+  const [error, setError] = useState<string>();
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<SignUpValues>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
       userName: "",
       password: "",
     },
   });
 
-  async function onSubmit(values: SignUpValues) {
-    setError(null);
+  const onSubmit = async (value: LoginValues) => {
+    setError(undefined);
     startTransition(async () => {
-      const { error } = await signup(values);
+      const { error } = await login(value);
       if (error) setError(error);
     });
-  }
-  // Đang xem đến đoạn 2:10:00
+  };
 
   return (
     <Form {...form}>
@@ -53,19 +50,11 @@ export default function SignUpForm() {
               <FormControl>
                 <Input placeholder="username" {...field} />
               </FormControl>
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input placeholder="email" {...field} />
-              </FormControl>
+              {form.formState.errors.userName && (
+                <p className="text-destructive text-sm">
+                  {form.formState.errors.userName.message}
+                </p>
+              )}
             </FormItem>
           )}
         />
@@ -77,12 +66,13 @@ export default function SignUpForm() {
             <FormItem>
               <FormLabel>Password</FormLabel>
               <FormControl>
-                <PasswordInput
-                  placeholder="password"
-                  type="password"
-                  {...field}
-                />
+                <PasswordInput placeholder="password" {...field} />
               </FormControl>
+              {form.formState.errors.password && (
+                <p className="text-destructive text-sm">
+                  {form.formState.errors.password.message}
+                </p>
+              )}
             </FormItem>
           )}
         />
@@ -97,4 +87,6 @@ export default function SignUpForm() {
       </form>
     </Form>
   );
-}
+};
+
+export default LoginForm;

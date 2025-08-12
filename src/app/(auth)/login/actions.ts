@@ -17,7 +17,7 @@ export async function login(
 
     const existingUser = await prisma.user.findFirst({
       where: {
-        userName: {
+        username: {
           equals: userName,
           mode: "insensitive",
         },

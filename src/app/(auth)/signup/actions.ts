@@ -24,9 +24,9 @@ export async function signup(
     const userId = generateIdFromEntropySize(10);
     const existingUserName = await prisma.user.findFirst({
       where: {
-        userName: {
+        username: {
           equals: userName,
-          maode: "insensitive",
+          mode: "insensitive",
         },
       },
     });
@@ -34,7 +34,7 @@ export async function signup(
     if (existingUserName) {
       return { error: "Username already exists" };
     }
-    const existingEmail = await prisma.user.findFist({
+    const existingEmail = await prisma.user.findFirst({
       where: {
         email: {
           equals: email,
@@ -47,25 +47,26 @@ export async function signup(
     }
 
     await prisma.user.create({
-        data: {
-            id: userId,
-            userName,
-            displayName: userName,
-            email,
-            passwordHash, 
-        }
+      data: {
+        id: userId,
+        username: userName,
+        displayName: userName,
+        email,
+        passwordHash,
+      },
     });
 
-    const session = await lucia.createSession(userId,{});
+    const session = await lucia.createSession(userId, {});
     const sessionCookie = lucia.createSessionCookie(session.id);
     (await cookies()).set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes,
-    )
-    return redirect("/")
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+    return redirect("/");
   } catch (error) {
-    if(isRedirectError(error)) throw error;
+    console.log("error signup  ----", error);
+    if (isRedirectError(error)) throw error;
     return { error: "Something went wrong" };
   }
 }
