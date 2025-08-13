@@ -7,6 +7,7 @@ interface loadingButtonProps {
   loading: boolean;
   disabled?: boolean;
   className?: string;
+  onClick: () => void;
   children: React.ReactNode;
 }
 
@@ -14,10 +15,12 @@ const LoadingButton = ({
   loading,
   className,
   disabled,
+  onClick,
   ...props
 }: loadingButtonProps) => {
   return (
     <Button
+      onClick={onClick}
       disabled={disabled || loading}
       className={cn("flex items-center justify-center", className)}
       {...props}
