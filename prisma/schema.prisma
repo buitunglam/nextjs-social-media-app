@@ -28,6 +28,8 @@ model User {
   sessions      Session[]
   createdAt    DateTime  @default(now())
   posts       Post[]
+  following   Follow[]  @relation("following")
+  followers   Follow[]  @relation("followers")
   // name of the table in the database
   @@map("users")
 }
@@ -39,6 +41,16 @@ model Session {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
+}
+
+model Follow {
+  followerId String
+  follower User @relation("following", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following User @relation("followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@map("follows")
 }
 
 model Post {

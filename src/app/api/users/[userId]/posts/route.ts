@@ -1,20 +1,23 @@
-import { Post } from "../../../../generated/prisma";
 import { validateRequest } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getPostDataInClude, PostData, PostPage } from "@/lib/types";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params: { userId } }: { params: { userId: string } },
+) {
   try {
     const cursor = req.nextUrl.searchParams.get("cursor") || undefined;
     const pageSize = 10;
 
-    const {user} = await validateRequest();
+    const { user } = await validateRequest();
     if (!user) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const posts = await prisma.post.findMany({
+      where: { userId: userId },
       include: getPostDataInClude(user.id),
       orderBy: { createdAt: "desc" },
       take: pageSize + 1,

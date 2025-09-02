@@ -1,12 +1,13 @@
 import { validateRequest } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { userDataSelect } from "@/lib/types";
+import { getUserDataSelect } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import React, { Suspense } from "react";
 import { Button } from "./ui/button";
 import { unstable_cache } from "next/cache";
 import { formatNumber } from "@/lib/utils";
+import FollowButton from "./FollowButton";
 
 const TrendSidebar = () => {
   return (
@@ -26,6 +27,7 @@ const TrendSidebar = () => {
 
 async function WhotoFollow() {
   const { user } = await validateRequest();
+  console.log("WhotoFollow user ---", user)
   // await new Promise((r) => setTimeout(r, 10000));
   if (!user) return null;
 
@@ -34,27 +36,42 @@ async function WhotoFollow() {
       NOT: {
         id: user.id,
       },
+      // alo remove followerId that already follow
+      // followers: {
+      //   none: {
+      //     followerId: user.id,
+      //   },
+      // },
     },
-    select: userDataSelect,
+    select: getUserDataSelect(user.id),
     take: 5,
   });
+  console.log("usersToFollow ---", usersToFollow);
 
   return (
     <div className="bg-card space-y-5 rounded-2xl p-5 shadow-sm">
       <div className="text-xl font-bold">Who to follow</div>
-      {usersToFollow.map((user) => (
-        <div className="flex items-center justify-between gap-3" key={user.id}>
-          <Link href={`/users/${user.id}`} className="flex items-center gap-3">
+      {usersToFollow.map((userFollow) => (
+        <div className="flex items-center justify-between gap-3" key={userFollow.id}>
+          <Link href={`/users/${userFollow.id}`} className="flex items-center gap-3">
             <div>
               <p className="line-clamp-1 font-semibold break-all hover:underline">
-                {user.displayName}
+                {userFollow.displayName}
               </p>
               <p className="text-muted-foreground line-clamp-1 break-all">
-                @{user.username}
+                @{userFollow.username}
               </p>
             </div>
           </Link>
-          <Button>Follow</Button>
+          <FollowButton
+            userId={userFollow.id}
+            initialState={{
+              followers: userFollow._count.followers,
+              isFollowedByUser: userFollow.followers.some(
+                ({ followerId }) => followerId === user.id,
+              ),
+            }}
+          />
         </div>
       ))}
     </div>

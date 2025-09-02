@@ -8,6 +8,7 @@ interface loadingButtonProps {
   disabled?: boolean;
   className?: string;
   onClick: () => void;
+  variant: string;
   children: React.ReactNode;
 }
 
@@ -16,6 +17,7 @@ const LoadingButton = ({
   className,
   disabled,
   onClick,
+  variant,
   ...props
 }: loadingButtonProps) => {
   return (
