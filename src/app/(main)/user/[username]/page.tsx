@@ -10,6 +10,7 @@ import { formatDate } from "date-fns";
 import { notFound } from "next/navigation";
 import React, { cache } from "react";
 import UserPosts from "./UserPosts";
+import Linkify from "@/components/Linkify";
 
 interface PageProps {
   params: { username: string };
@@ -109,9 +110,11 @@ const UserProfile = async ({ user, loggedInUserId }: UserProfileProps) => {
       {user.bio && (
         <>
           <hr />
-          <div className="overflow-hidden break-words whitespace-pre-line">
-            {user.bio}
-          </div>
+          <Linkify>
+            <div className="overflow-hidden break-words whitespace-pre-line">
+              {user.bio}
+            </div>
+          </Linkify>
         </>
       )}
     </div>

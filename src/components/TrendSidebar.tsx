@@ -8,6 +8,7 @@ import { Button } from "./ui/button";
 import { unstable_cache } from "next/cache";
 import { formatNumber } from "@/lib/utils";
 import FollowButton from "./FollowButton";
+import UserTooltip from "./UserTooltip";
 
 const TrendSidebar = () => {
   return (
@@ -27,7 +28,7 @@ const TrendSidebar = () => {
 
 async function WhotoFollow() {
   const { user } = await validateRequest();
-  console.log("WhotoFollow user ---", user)
+  console.log("WhotoFollow user ---", user);
   // await new Promise((r) => setTimeout(r, 10000));
   if (!user) return null;
 
@@ -52,17 +53,25 @@ async function WhotoFollow() {
     <div className="bg-card space-y-5 rounded-2xl p-5 shadow-sm">
       <div className="text-xl font-bold">Who to follow</div>
       {usersToFollow.map((userFollow) => (
-        <div className="flex items-center justify-between gap-3" key={userFollow.id}>
-          <Link href={`/users/${userFollow.id}`} className="flex items-center gap-3">
-            <div>
-              <p className="line-clamp-1 font-semibold break-all hover:underline">
-                {userFollow.displayName}
-              </p>
-              <p className="text-muted-foreground line-clamp-1 break-all">
-                @{userFollow.username}
-              </p>
-            </div>
-          </Link>
+        <div
+          className="flex items-center justify-between gap-3"
+          key={userFollow.id}
+        >
+          <UserTooltip user={userFollow}>
+            <Link
+              href={`/users/${userFollow.id}`}
+              className="flex items-center gap-3"
+            >
+              <div>
+                <p className="line-clamp-1 font-semibold break-all hover:underline">
+                  {userFollow.displayName}
+                </p>
+                <p className="text-muted-foreground line-clamp-1 break-all">
+                  @{userFollow.username}
+                </p>
+              </div>
+            </Link>
+          </UserTooltip>
           <FollowButton
             userId={userFollow.id}
             initialState={{
